@@ -1,0 +1,42 @@
+{
+  "workerPoolSpecs": [
+    {
+      "machineSpec": {
+        "machineType": "e2-standard-4"
+      },
+      "replicaCount": "1",
+      "diskSpec": {
+        "bootDiskType": "pd-ssd",
+        "bootDiskSizeGb": 100
+      },
+      "containerSpec": {
+        "imageUri": "python:3.12",
+        "command": [
+          "sh",
+          "-c",
+          "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.23' 'urllib3<2' && \"$0\" \"$@\"\n",
+          "sh",
+          "-ec",
+          "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+          "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef build_sentence(\n    product: str,\n    emoji: str,\n    emojitext: str\n) -> str:\n    print(\"We completed the pipeline, hooray!\")\n    end_str = product + \" is \"\n    if len(emoji) > 0:\n        end_str += emoji\n    else:\n        end_str += emojitext\n    return(end_str)\n\n"
+        ],
+        "args": [
+          "--executor_input",
+          "{\"inputs\":{\"parameterValues\":{\"emoji\":\"✨\",\"emojitext\":\"sparkles\",\"product\":\"Vertex AI Pipelines\"},\"parameters\":{\"emoji\":{\"stringValue\":\"✨\"},\"emojitext\":{\"stringValue\":\"sparkles\"},\"product\":{\"stringValue\":\"Vertex AI Pipelines\"}}},\"outputs\":{\"outputFile\":\"/gcs/qwiklabs-gcp-04-e45c82dd187e-labconfig-bucket/pipeline_root/304826613146/hello-world-20260114090201/build-sentence_3274065217692106752/executor_output.json\",\"parameters\":{\"Output\":{\"outputFile\":\"/gcs/qwiklabs-gcp-04-e45c82dd187e-labconfig-bucket/pipeline_root/304826613146/hello-world-20260114090201/build-sentence_3274065217692106752/Output\"}}}}",
+          "--function_to_execute",
+          "build_sentence"
+        ],
+        "env": [
+          {
+            "name": "VERTEX_AI_PIPELINES_RUN_LABELS",
+            "value": "{\"vertex-ai-pipelines-run-billing-id\":\"6182321198836219904\"}"
+          }
+        ]
+      }
+    }
+  ],
+  "scheduling": {
+    "disableRetries": true
+  },
+  "serviceAccount": "304826613146-compute@developer.gserviceaccount.com"
+}

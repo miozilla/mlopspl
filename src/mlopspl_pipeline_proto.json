@@ -1,0 +1,717 @@
+{
+  "name": "projects/304826613146/locations/us-central1/pipelineJobs/hello-world-20260114090201",
+  "displayName": "hello-world-20260114090201",
+  "createTime": "2026-01-14T09:02:01.995403Z",
+  "startTime": "2026-01-14T09:02:09.309407Z",
+  "updateTime": "2026-01-14T09:02:09.662495Z",
+  "pipelineSpec": {
+    "deploymentConfig": {
+      "@type": "type.googleapis.com/ml_pipelines.PipelineDeploymentConfig",
+      "executors": {
+        "exec-build-sentence": {
+          "container": {
+            "image": "python:3.12",
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef build_sentence(\n    product: str,\n    emoji: str,\n    emojitext: str\n) -> str:\n    print(\"We completed the pipeline, hooray!\")\n    end_str = product + \" is \"\n    if len(emoji) > 0:\n        end_str += emoji\n    else:\n        end_str += emojitext\n    return(end_str)\n\n"
+            ],
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "build_sentence"
+            ]
+          }
+        },
+        "exec-emoji": {
+          "container": {
+            "image": "python:3.12",
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'emoji' 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef emoji(\n    text: str,\n) -> NamedTuple(\n    \"Outputs\",\n    [\n        (\"emoji_text\", str),  # Return parameters\n        (\"emoji\", str),\n    ],\n):\n    import emoji\n\n    emoji_text = text\n    emoji_str = emoji.emojize(':' + emoji_text + ':', language='alias')\n    print(\"output one: {}; output_two: {}\".format(emoji_text, emoji_str))\n    return (emoji_text, emoji_str)\n\n"
+            ],
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "emoji"
+            ]
+          }
+        },
+        "exec-product-name": {
+          "container": {
+            "image": "python:3.12",
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef product_name(text: str) -> str:\n    return text\n\n"
+            ],
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "product_name"
+            ]
+          }
+        }
+      }
+    },
+    "components": {
+      "comp-build-sentence": {
+        "inputDefinitions": {
+          "parameters": {
+            "emoji": {
+              "type": "STRING"
+            },
+            "emojitext": {
+              "type": "STRING"
+            },
+            "product": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "Output": {
+              "type": "STRING"
+            }
+          }
+        },
+        "executorLabel": "exec-build-sentence"
+      },
+      "comp-emoji": {
+        "inputDefinitions": {
+          "parameters": {
+            "text": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "emoji": {
+              "type": "STRING"
+            },
+            "emoji_text": {
+              "type": "STRING"
+            }
+          }
+        },
+        "executorLabel": "exec-emoji"
+      },
+      "comp-product-name": {
+        "inputDefinitions": {
+          "parameters": {
+            "text": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "Output": {
+              "type": "STRING"
+            }
+          }
+        },
+        "executorLabel": "exec-product-name"
+      }
+    },
+    "schemaVersion": "2.0.0",
+    "root": {
+      "inputDefinitions": {
+        "parameters": {
+          "emoji_str": {
+            "type": "STRING"
+          },
+          "text": {
+            "type": "STRING"
+          }
+        }
+      },
+      "dag": {
+        "tasks": {
+          "build-sentence": {
+            "taskInfo": {
+              "name": "build-sentence"
+            },
+            "inputs": {
+              "parameters": {
+                "emoji": {
+                  "taskOutputParameter": {
+                    "producerTask": "emoji",
+                    "outputParameterKey": "emoji"
+                  }
+                },
+                "emojitext": {
+                  "taskOutputParameter": {
+                    "producerTask": "emoji",
+                    "outputParameterKey": "emoji_text"
+                  }
+                },
+                "product": {
+                  "taskOutputParameter": {
+                    "producerTask": "product-name",
+                    "outputParameterKey": "Output"
+                  }
+                }
+              }
+            },
+            "dependentTasks": [
+              "emoji",
+              "product-name"
+            ],
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-build-sentence"
+            }
+          },
+          "emoji": {
+            "taskInfo": {
+              "name": "emoji"
+            },
+            "inputs": {
+              "parameters": {
+                "text": {
+                  "componentInputParameter": "emoji_str"
+                }
+              }
+            },
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-emoji"
+            }
+          },
+          "product-name": {
+            "taskInfo": {
+              "name": "product-name"
+            },
+            "inputs": {
+              "parameters": {
+                "text": {
+                  "componentInputParameter": "text"
+                }
+              }
+            },
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-product-name"
+            }
+          }
+        }
+      }
+    },
+    "sdkVersion": "kfp-1.8.23",
+    "pipelineInfo": {
+      "name": "hello-world"
+    },
+    "deploymentSpec": {
+      "executors": {
+        "exec-build-sentence": {
+          "container": {
+            "image": "python:3.12",
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef build_sentence(\n    product: str,\n    emoji: str,\n    emojitext: str\n) -> str:\n    print(\"We completed the pipeline, hooray!\")\n    end_str = product + \" is \"\n    if len(emoji) > 0:\n        end_str += emoji\n    else:\n        end_str += emojitext\n    return(end_str)\n\n"
+            ],
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "build_sentence"
+            ]
+          }
+        },
+        "exec-emoji": {
+          "container": {
+            "image": "python:3.12",
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'emoji' 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef emoji(\n    text: str,\n) -> NamedTuple(\n    \"Outputs\",\n    [\n        (\"emoji_text\", str),  # Return parameters\n        (\"emoji\", str),\n    ],\n):\n    import emoji\n\n    emoji_text = text\n    emoji_str = emoji.emojize(':' + emoji_text + ':', language='alias')\n    print(\"output one: {}; output_two: {}\".format(emoji_text, emoji_str))\n    return (emoji_text, emoji_str)\n\n"
+            ],
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "emoji"
+            ]
+          }
+        },
+        "exec-product-name": {
+          "container": {
+            "image": "python:3.12",
+            "command": [
+              "sh",
+              "-c",
+              "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+              "sh",
+              "-ec",
+              "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+              "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef product_name(text: str) -> str:\n    return text\n\n"
+            ],
+            "args": [
+              "--executor_input",
+              "{{$}}",
+              "--function_to_execute",
+              "product_name"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "state": "PIPELINE_STATE_RUNNING",
+  "jobDetail": {
+    "pipelineContext": {
+      "name": "projects/304826613146/locations/us-central1/metadataStores/default/contexts/hello-world",
+      "displayName": "hello-world",
+      "instanceSchemaTitle": "system.Pipeline",
+      "etag": "1768381329407",
+      "createTime": "2026-01-14T09:02:09.407Z",
+      "updateTime": "2026-01-14T09:02:09.407Z",
+      "schemaTitle": "system.Pipeline",
+      "schemaVersion": "0.0.1",
+      "metadata": {}
+    },
+    "pipelineRunContext": {
+      "name": "projects/304826613146/locations/us-central1/metadataStores/default/contexts/hello-world-20260114090201",
+      "displayName": "hello-world-20260114090201",
+      "instanceSchemaTitle": "system.PipelineRun",
+      "etag": "1768381329528",
+      "createTime": "2026-01-14T09:02:09.528Z",
+      "updateTime": "2026-01-14T09:02:09.528Z",
+      "parentContexts": [
+        "projects/304826613146/locations/us-central1/metadataStores/default/contexts/hello-world"
+      ],
+      "schemaTitle": "system.PipelineRun",
+      "schemaVersion": "0.0.1",
+      "metadata": {}
+    },
+    "taskDetails": [
+      {
+        "taskId": "-8099775641232080896",
+        "taskName": "hello-world-20260114090201",
+        "createTime": "2026-01-14T09:02:09.309407Z",
+        "startTime": "2026-01-14T09:02:09.945759Z",
+        "executorDetail": {},
+        "state": "RUNNING",
+        "execution": {
+          "name": "projects/304826613146/locations/us-central1/metadataStores/default/executions/14266776873972613533",
+          "displayName": "hello-world-20260114090201",
+          "instanceSchemaTitle": "system.Run",
+          "state": "RUNNING",
+          "customProperties": {
+            "input:text": {
+              "stringValue": "Vertex AI Pipelines"
+            },
+            "input:emoji_str": {
+              "stringValue": "sparkles"
+            }
+          },
+          "etag": "1768381329762",
+          "createTime": "2026-01-14T09:02:09.762Z",
+          "updateTime": "2026-01-14T09:02:09.762Z",
+          "schemaTitle": "system.Run",
+          "schemaVersion": "0.0.1",
+          "metadata": {
+            "vmlmd_lineage_integration": {
+              "pipeline_run_component": {
+                "project_id": "qwiklabs-gcp-04-e45c82dd187e",
+                "task_name": "hello-world-20260114090201",
+                "location_id": "us-central1",
+                "pipeline_run_id": "hello-world-20260114090201",
+                "parent_task_names": []
+              }
+            },
+            "input:text": "Vertex AI Pipelines",
+            "input:emoji_str": "sparkles"
+          }
+        },
+        "pipelineTaskStatus": [
+          {
+            "updateTime": "2026-01-14T09:02:09.695922985Z",
+            "state": "RUNNING"
+          }
+        ],
+        "taskUniqueName": "hello-world-20260114090201"
+      },
+      {
+        "taskId": "-5949306819162669056",
+        "taskName": "emoji",
+        "createTime": "2026-01-14T09:02:09.945759Z",
+        "startTime": "2026-01-14T09:02:10.492696Z",
+        "executorDetail": {
+          "containerDetail": {
+            "mainJob": "projects/304826613146/locations/us-central1/customJobs/4824725381380571136"
+          }
+        },
+        "state": "RUNNING",
+        "execution": {
+          "name": "projects/304826613146/locations/us-central1/metadataStores/default/executions/14960555540689970364",
+          "displayName": "emoji",
+          "instanceSchemaTitle": "system.ContainerExecution",
+          "state": "RUNNING",
+          "customProperties": {
+            "input:text": {
+              "stringValue": "sparkles"
+            }
+          },
+          "etag": "1768381330455",
+          "createTime": "2026-01-14T09:02:10.153Z",
+          "updateTime": "2026-01-14T09:02:10.455Z",
+          "schemaTitle": "system.ContainerExecution",
+          "schemaVersion": "0.0.1",
+          "metadata": {
+            "vmlmd_lineage_integration": {
+              "pipeline_run_component": {
+                "project_id": "qwiklabs-gcp-04-e45c82dd187e",
+                "parent_task_names": [
+                  "hello-world-20260114090201"
+                ],
+                "location_id": "us-central1",
+                "task_name": "emoji",
+                "pipeline_run_id": "hello-world-20260114090201"
+              }
+            },
+            "input:text": "sparkles"
+          }
+        },
+        "parentTaskId": "-8099775641232080896",
+        "pipelineTaskStatus": [
+          {
+            "updateTime": "2026-01-14T09:02:10.873274051Z",
+            "state": "RUNNING"
+          }
+        ],
+        "taskUniqueName": "emoji"
+      },
+      {
+        "taskId": "3274065217692106752",
+        "taskName": "build-sentence",
+        "createTime": "2026-01-14T09:02:09.945759Z",
+        "executorDetail": {},
+        "state": "PENDING",
+        "parentTaskId": "-8099775641232080896",
+        "taskUniqueName": "build-sentence"
+      },
+      {
+        "taskId": "7885751236119494656",
+        "taskName": "product-name",
+        "createTime": "2026-01-14T09:02:09.945759Z",
+        "startTime": "2026-01-14T09:02:10.484139Z",
+        "executorDetail": {
+          "containerDetail": {
+            "mainJob": "projects/304826613146/locations/us-central1/customJobs/2867348393334669312"
+          }
+        },
+        "state": "RUNNING",
+        "execution": {
+          "name": "projects/304826613146/locations/us-central1/metadataStores/default/executions/658189456335949423",
+          "displayName": "product-name",
+          "instanceSchemaTitle": "system.ContainerExecution",
+          "state": "RUNNING",
+          "customProperties": {
+            "input:text": {
+              "stringValue": "Vertex AI Pipelines"
+            }
+          },
+          "etag": "1768381330443",
+          "createTime": "2026-01-14T09:02:10.153Z",
+          "updateTime": "2026-01-14T09:02:10.443Z",
+          "schemaTitle": "system.ContainerExecution",
+          "schemaVersion": "0.0.1",
+          "metadata": {
+            "vmlmd_lineage_integration": {
+              "pipeline_run_component": {
+                "parent_task_names": [
+                  "hello-world-20260114090201"
+                ],
+                "location_id": "us-central1",
+                "project_id": "qwiklabs-gcp-04-e45c82dd187e",
+                "pipeline_run_id": "hello-world-20260114090201",
+                "task_name": "product-name"
+              }
+            },
+            "input:text": "Vertex AI Pipelines"
+          }
+        },
+        "parentTaskId": "-8099775641232080896",
+        "pipelineTaskStatus": [
+          {
+            "updateTime": "2026-01-14T09:02:11.049592067Z",
+            "state": "RUNNING"
+          }
+        ],
+        "taskUniqueName": "product-name"
+      }
+    ]
+  },
+  "labels": {
+    "vertex-ai-pipelines-run-billing-id": "6182321198836219904"
+  },
+  "runtimeConfig": {
+    "parameters": {
+      "emoji_str": {
+        "stringValue": "sparkles"
+      },
+      "text": {
+        "stringValue": "Vertex AI Pipelines"
+      }
+    },
+    "gcsOutputDirectory": "gs://qwiklabs-gcp-04-e45c82dd187e-labconfig-bucket/pipeline_root/"
+  },
+  "uiPipelineSpec": {
+    "pipelineInfo": {
+      "name": "hello-world"
+    },
+    "sdkVersion": "kfp-1.8.23",
+    "schemaVersion": "2.0.0",
+    "components": {
+      "comp-build-sentence": {
+        "inputDefinitions": {
+          "parameters": {
+            "emoji": {
+              "type": "STRING"
+            },
+            "emojitext": {
+              "type": "STRING"
+            },
+            "product": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "Output": {
+              "type": "STRING"
+            }
+          }
+        },
+        "executorLabel": "exec-build-sentence"
+      },
+      "comp-emoji": {
+        "inputDefinitions": {
+          "parameters": {
+            "text": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "emoji": {
+              "type": "STRING"
+            },
+            "emoji_text": {
+              "type": "STRING"
+            }
+          }
+        },
+        "executorLabel": "exec-emoji"
+      },
+      "comp-product-name": {
+        "inputDefinitions": {
+          "parameters": {
+            "text": {
+              "type": "STRING"
+            }
+          }
+        },
+        "outputDefinitions": {
+          "parameters": {
+            "Output": {
+              "type": "STRING"
+            }
+          }
+        },
+        "executorLabel": "exec-product-name"
+      }
+    },
+    "root": {
+      "inputDefinitions": {
+        "parameters": {
+          "emoji_str": {
+            "type": "STRING"
+          },
+          "text": {
+            "type": "STRING"
+          }
+        }
+      },
+      "dag": {
+        "tasks": {
+          "build-sentence": {
+            "taskInfo": {
+              "name": "build-sentence"
+            },
+            "inputs": {
+              "parameters": {
+                "emoji": {
+                  "taskOutputParameter": {
+                    "producerTask": "emoji",
+                    "outputParameterKey": "emoji"
+                  }
+                },
+                "emojitext": {
+                  "taskOutputParameter": {
+                    "producerTask": "emoji",
+                    "outputParameterKey": "emoji_text"
+                  }
+                },
+                "product": {
+                  "taskOutputParameter": {
+                    "producerTask": "product-name",
+                    "outputParameterKey": "Output"
+                  }
+                }
+              }
+            },
+            "dependentTasks": [
+              "emoji",
+              "product-name"
+            ],
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-build-sentence"
+            }
+          },
+          "emoji": {
+            "taskInfo": {
+              "name": "emoji"
+            },
+            "inputs": {
+              "parameters": {
+                "text": {
+                  "componentInputParameter": "emoji_str"
+                }
+              }
+            },
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-emoji"
+            }
+          },
+          "product-name": {
+            "taskInfo": {
+              "name": "product-name"
+            },
+            "inputs": {
+              "parameters": {
+                "text": {
+                  "componentInputParameter": "text"
+                }
+              }
+            },
+            "cachingOptions": {
+              "enableCache": true
+            },
+            "componentRef": {
+              "name": "comp-product-name"
+            }
+          }
+        }
+      }
+    }
+  },
+  "uiPipelineDeploymentConfig": {
+    "executors": {
+      "exec-build-sentence": {
+        "container": {
+          "image": "python:3.12",
+          "command": [
+            "sh",
+            "-c",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+            "sh",
+            "-ec",
+            "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+            "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef build_sentence(\n    product: str,\n    emoji: str,\n    emojitext: str\n) -> str:\n    print(\"We completed the pipeline, hooray!\")\n    end_str = product + \" is \"\n    if len(emoji) > 0:\n        end_str += emoji\n    else:\n        end_str += emojitext\n    return(end_str)\n\n"
+          ],
+          "args": [
+            "--executor_input",
+            "{{$}}",
+            "--function_to_execute",
+            "build_sentence"
+          ]
+        }
+      },
+      "exec-emoji": {
+        "container": {
+          "image": "python:3.12",
+          "command": [
+            "sh",
+            "-c",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'emoji' 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+            "sh",
+            "-ec",
+            "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+            "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef emoji(\n    text: str,\n) -> NamedTuple(\n    \"Outputs\",\n    [\n        (\"emoji_text\", str),  # Return parameters\n        (\"emoji\", str),\n    ],\n):\n    import emoji\n\n    emoji_text = text\n    emoji_str = emoji.emojize(':' + emoji_text + ':', language='alias')\n    print(\"output one: {}; output_two: {}\".format(emoji_text, emoji_str))\n    return (emoji_text, emoji_str)\n\n"
+          ],
+          "args": [
+            "--executor_input",
+            "{{$}}",
+            "--function_to_execute",
+            "emoji"
+          ]
+        }
+      },
+      "exec-product-name": {
+        "container": {
+          "image": "python:3.12",
+          "command": [
+            "sh",
+            "-c",
+            "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'kfp==1.8.23' && \"$0\" \"$@\"\n",
+            "sh",
+            "-ec",
+            "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+            "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef product_name(text: str) -> str:\n    return text\n\n"
+          ],
+          "args": [
+            "--executor_input",
+            "{{$}}",
+            "--function_to_execute",
+            "product_name"
+          ]
+        }
+      }
+    }
+  },
+  "serviceAccount": "304826613146-compute@developer.gserviceaccount.com"
+}

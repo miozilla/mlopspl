@@ -1,0 +1,42 @@
+{
+  "workerPoolSpecs": [
+    {
+      "machineSpec": {
+        "machineType": "e2-standard-4"
+      },
+      "replicaCount": "1",
+      "diskSpec": {
+        "bootDiskType": "pd-ssd",
+        "bootDiskSizeGb": 100
+      },
+      "containerSpec": {
+        "imageUri": "python:3.12",
+        "command": [
+          "sh",
+          "-c",
+          "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip || python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1 python3 -m pip install --quiet     --no-warn-script-location 'emoji' 'kfp==1.8.23' 'urllib3<2' && \"$0\" \"$@\"\n",
+          "sh",
+          "-ec",
+          "program_path=$(mktemp -d)\nprintf \"%s\" \"$0\" > \"$program_path/ephemeral_component.py\"\npython3 -m kfp.v2.components.executor_main                         --component_module_path                         \"$program_path/ephemeral_component.py\"                         \"$@\"\n",
+          "\nimport kfp\nfrom kfp.v2 import dsl\nfrom kfp.v2.dsl import *\nfrom typing import *\n\ndef emoji(\n    text: str,\n) -> NamedTuple(\n    \"Outputs\",\n    [\n        (\"emoji_text\", str),  # Return parameters\n        (\"emoji\", str),\n    ],\n):\n    import emoji\n\n    emoji_text = text\n    emoji_str = emoji.emojize(':' + emoji_text + ':', language='alias')\n    print(\"output one: {}; output_two: {}\".format(emoji_text, emoji_str))\n    return (emoji_text, emoji_str)\n\n"
+        ],
+        "args": [
+          "--executor_input",
+          "{\"inputs\":{\"parameterValues\":{\"text\":\"sparkles\"},\"parameters\":{\"text\":{\"stringValue\":\"sparkles\"}}},\"outputs\":{\"outputFile\":\"/gcs/qwiklabs-gcp-04-e45c82dd187e-labconfig-bucket/pipeline_root/304826613146/hello-world-20260114090201/emoji_-5949306819162669056/executor_output.json\",\"parameters\":{\"emoji\":{\"outputFile\":\"/gcs/qwiklabs-gcp-04-e45c82dd187e-labconfig-bucket/pipeline_root/304826613146/hello-world-20260114090201/emoji_-5949306819162669056/emoji\"},\"emoji_text\":{\"outputFile\":\"/gcs/qwiklabs-gcp-04-e45c82dd187e-labconfig-bucket/pipeline_root/304826613146/hello-world-20260114090201/emoji_-5949306819162669056/emoji_text\"}}}}",
+          "--function_to_execute",
+          "emoji"
+        ],
+        "env": [
+          {
+            "name": "VERTEX_AI_PIPELINES_RUN_LABELS",
+            "value": "{\"vertex-ai-pipelines-run-billing-id\":\"6182321198836219904\"}"
+          }
+        ]
+      }
+    }
+  ],
+  "scheduling": {
+    "disableRetries": true
+  },
+  "serviceAccount": "304826613146-compute@developer.gserviceaccount.com"
+}
